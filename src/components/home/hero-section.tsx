@@ -13,48 +13,48 @@ const FALLBACK_IMAGE = "/placeholder.svg?height=1400&width=2400";
 
 const heroClasses = {
   'search-first': {
-    section: 'border-b border-slate-200 bg-[linear-gradient(180deg,#edf5ff_0%,#f8fbff_42%,#ffffff_100%)] text-slate-950',
-    overlay: 'bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_26%),radial-gradient(circle_at_top_right,rgba(15,23,42,0.12),transparent_26%)]',
+    section: 'border-b border-[rgba(40,9,5,0.08)] bg-[linear-gradient(180deg,#ffffff_0%,#fff7f2_48%,#fffdfb_100%)] text-[#280905]',
+    overlay: 'bg-[radial-gradient(circle_at_top_left,rgba(195,17,12,0.12),transparent_28%),radial-gradient(circle_at_top_right,rgba(230,80,27,0.1),transparent_26%)]',
     grid: 'lg:grid-cols-[1.08fr_0.92fr]',
-    card: 'border border-white/70 bg-white/80 shadow-[0_28px_90px_rgba(15,23,42,0.12)]',
-    title: 'text-slate-950',
-    body: 'text-slate-600',
-    badge: 'bg-slate-950 text-white',
-    primary: 'bg-slate-950 text-white hover:bg-slate-800',
-    secondary: 'border border-slate-200 bg-white text-slate-900 hover:bg-slate-100',
+    card: 'border border-[rgba(40,9,5,0.08)] bg-white/90 shadow-[0_28px_90px_rgba(40,9,5,0.08)]',
+    title: 'text-[#280905]',
+    body: 'text-[#5c2f28]',
+    badge: 'bg-[#280905] text-[#fff4ec]',
+    primary: 'bg-[#c3110c] text-white hover:bg-[#740a03]',
+    secondary: 'border border-[rgba(40,9,5,0.12)] bg-white text-[#280905] hover:bg-[#fff0ea]',
   },
   'spotlight-split': {
-    section: 'border-b border-[rgba(123,72,35,0.14)] bg-[linear-gradient(180deg,#1f1613_0%,#2d1d17_50%,#fff7ed_100%)] text-white',
-    overlay: 'bg-[linear-gradient(90deg,rgba(20,12,9,0.88)_0%,rgba(32,19,14,0.66)_45%,rgba(255,247,237,0)_100%)]',
+    section: 'border-b border-[rgba(40,9,5,0.1)] bg-[linear-gradient(180deg,#2a0b08_0%,#4a120d_42%,#fff7f2_100%)] text-white',
+    overlay: 'bg-[linear-gradient(90deg,rgba(40,9,5,0.92)_0%,rgba(116,10,3,0.55)_42%,rgba(255,247,242,0)_100%)]',
     grid: 'lg:grid-cols-[1.14fr_0.86fr]',
-    card: 'border border-white/10 bg-white/8 shadow-[0_28px_100px_rgba(18,9,4,0.4)] backdrop-blur-md',
+    card: 'border border-white/12 bg-white/10 shadow-[0_28px_100px_rgba(40,9,5,0.35)] backdrop-blur-md',
     title: 'text-white',
-    body: 'text-amber-100/78',
-    badge: 'bg-[#ffdd9c] text-[#2a160c]',
-    primary: 'bg-[#ffdd9c] text-[#2a160c] hover:bg-[#ffd17d]',
-    secondary: 'border border-white/18 bg-white/10 text-white hover:bg-white/16',
+    body: 'text-[#fcdfd6]/85',
+    badge: 'bg-[#e6501b] text-[#280905]',
+    primary: 'bg-[#c3110c] text-white hover:bg-[#740a03]',
+    secondary: 'border border-white/20 bg-white/10 text-white hover:bg-white/16',
   },
   'gallery-mosaic': {
-    section: 'border-b border-slate-800 bg-[linear-gradient(180deg,#07111f_0%,#0c172b_45%,#101c31_100%)] text-white',
-    overlay: 'bg-[radial-gradient(circle_at_top_left,rgba(110,231,183,0.16),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.16),transparent_26%)]',
+    section: 'border-b border-[rgba(40,9,5,0.08)] bg-[linear-gradient(180deg,#fffdfb_0%,#fff4ec_45%,#ffffff_100%)] text-[#280905]',
+    overlay: 'bg-[radial-gradient(circle_at_top_left,rgba(195,17,12,0.14),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(230,80,27,0.12),transparent_28%)]',
     grid: 'lg:grid-cols-[0.95fr_1.05fr]',
-    card: 'border border-white/10 bg-slate-900/65 shadow-[0_30px_110px_rgba(15,23,42,0.45)] backdrop-blur-xl',
-    title: 'text-white',
-    body: 'text-slate-300',
-    badge: 'bg-[#8df0c8] text-[#07111f]',
-    primary: 'bg-[#8df0c8] text-[#07111f] hover:bg-[#77dfb8]',
-    secondary: 'border border-white/18 bg-white/6 text-white hover:bg-white/12',
+    card: 'border border-[rgba(40,9,5,0.1)] bg-white/85 shadow-[0_30px_100px_rgba(40,9,5,0.1)] backdrop-blur-xl',
+    title: 'text-[#280905]',
+    body: 'text-[#5c2f28]',
+    badge: 'bg-[#280905] text-[#fff4ec]',
+    primary: 'bg-[#c3110c] text-white hover:bg-[#740a03]',
+    secondary: 'border border-[rgba(40,9,5,0.12)] bg-[#fff5f0] text-[#280905] hover:bg-[#ffe8de]',
   },
   'catalog-promo': {
-    section: 'border-b border-[rgba(66,74,42,0.14)] bg-[linear-gradient(180deg,#f6f6ee_0%,#f4f7df_35%,#ffffff_100%)] text-[#18210f]',
-    overlay: 'bg-[radial-gradient(circle_at_top_right,rgba(163,230,53,0.16),transparent_22%),radial-gradient(circle_at_top_left,rgba(34,197,94,0.14),transparent_24%)]',
+    section: 'border-b border-[rgba(40,9,5,0.08)] bg-[linear-gradient(180deg,#fffdfb_0%,#fff4ec_35%,#ffffff_100%)] text-[#280905]',
+    overlay: 'bg-[radial-gradient(circle_at_top_right,rgba(230,80,27,0.12),transparent_24%),radial-gradient(circle_at_top_left,rgba(195,17,12,0.1),transparent_24%)]',
     grid: 'lg:grid-cols-[1.12fr_0.88fr]',
-    card: 'border border-[#dce5c2] bg-white/90 shadow-[0_28px_80px_rgba(64,76,34,0.12)]',
-    title: 'text-[#18210f]',
-    body: 'text-[#5c684b]',
-    badge: 'bg-[#18210f] text-[#ebf5d9]',
-    primary: 'bg-[#18210f] text-[#ebf5d9] hover:bg-[#25331a]',
-    secondary: 'border border-[#dce5c2] bg-white text-[#18210f] hover:bg-[#f4f7df]',
+    card: 'border border-[rgba(116,10,3,0.12)] bg-white/92 shadow-[0_28px_80px_rgba(40,9,5,0.08)]',
+    title: 'text-[#280905]',
+    body: 'text-[#5c2f28]',
+    badge: 'bg-[#280905] text-[#fff4ec]',
+    primary: 'bg-[#c3110c] text-white hover:bg-[#740a03]',
+    secondary: 'border border-[rgba(116,10,3,0.15)] bg-white text-[#280905] hover:bg-[#fff0ea]',
   },
 } as const;
 
@@ -113,14 +113,11 @@ export function HeroSection({ images, tasks }: { images: string[]; tasks: TaskCo
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className={`rounded-full px-6 ${palette.secondary}`}>
-                <Link href={siteContent.hero.secondaryCta.href}>{siteContent.hero.secondaryCta.label}</Link>
-              </Button>
             </div>
 
             <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-[1.1fr_0.9fr]">
               <div className={`flex items-center gap-3 rounded-[1.6rem] p-4 ${palette.card}`}>
-                <div className="rounded-full bg-white/10 p-3 text-current">
+                <div className="rounded-full bg-[#fff0ea] p-3 text-[#c3110c]">
                   <Search className="h-5 w-5" />
                 </div>
                 <div>
@@ -130,7 +127,7 @@ export function HeroSection({ images, tasks }: { images: string[]; tasks: TaskCo
                 </div>
               </div>
               <div className={`flex items-center gap-3 rounded-[1.6rem] p-4 ${palette.card}`}>
-                <div className="rounded-full bg-white/10 p-3 text-current">
+                <div className="rounded-full bg-[#fff0ea] p-3 text-[#c3110c]">
                   <Compass className="h-5 w-5" />
                 </div>
                 <div>
@@ -158,7 +155,7 @@ export function HeroSection({ images, tasks }: { images: string[]; tasks: TaskCo
                 </div>
                 <div className="flex flex-col justify-between gap-4">
                   {featuredTasks.map((task, index) => (
-                    <div key={task.key} className="rounded-[1.4rem] border border-white/10 bg-black/10 p-4">
+                    <div key={task.key} className="rounded-[1.4rem] border border-[rgba(40,9,5,0.08)] bg-[#fff7f2] p-4">
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] opacity-65">Lane {index + 1}</p>

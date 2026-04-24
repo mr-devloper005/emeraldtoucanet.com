@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth-context'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { cn } from '@/lib/utils'
-import { siteContent } from '@/config/site.content'
+import { navbarHiddenTaskKeys, siteContent } from '@/config/site.content'
 import { getFactoryState } from '@/design/factory/get-factory-state'
 import { NAVBAR_OVERRIDE_ENABLED, NavbarOverride } from '@/overrides/navbar'
 
@@ -33,12 +33,12 @@ const taskIcons: Record<TaskKey, any> = {
 
 const variantClasses = {
   'compact-bar': {
-    shell: 'border-b border-slate-200/80 bg-white/88 text-slate-950 backdrop-blur-xl',
-    logo: 'rounded-2xl border border-slate-200 bg-white shadow-sm',
-    active: 'bg-slate-950 text-white',
-    idle: 'text-slate-600 hover:bg-slate-100 hover:text-slate-950',
-    cta: 'rounded-full bg-slate-950 text-white hover:bg-slate-800',
-    mobile: 'border-t border-slate-200/70 bg-white/95',
+    shell: 'border-b border-[rgba(40,9,5,0.08)] bg-[rgba(255,253,251,0.92)] text-[#280905] backdrop-blur-xl shadow-[0_1px_0_rgba(40,9,5,0.04)]',
+    logo: 'rounded-2xl border border-[rgba(116,10,3,0.12)] bg-white shadow-[0_8px_30px_rgba(40,9,5,0.06)]',
+    active: 'bg-[#280905] text-[#fff4ec]',
+    idle: 'text-[#5c2f28] hover:bg-[#fff0ea] hover:text-[#280905]',
+    cta: 'rounded-full bg-[#c3110c] text-white shadow-[0_10px_30px_rgba(195,17,12,0.25)] hover:bg-[#740a03]',
+    mobile: 'border-t border-[rgba(40,9,5,0.08)] bg-[#fffdfb]',
   },
   'editorial-bar': {
     shell: 'border-b border-[#d7c4b3] bg-[#fff7ee]/90 text-[#2f1d16] backdrop-blur-xl',
@@ -49,12 +49,12 @@ const variantClasses = {
     mobile: 'border-t border-[#dbc6b6] bg-[#fff7ee]',
   },
   'floating-bar': {
-    shell: 'border-b border-transparent bg-transparent text-white',
-    logo: 'rounded-[1.35rem] border border-white/12 bg-white/8 shadow-[0_16px_48px_rgba(15,23,42,0.22)] backdrop-blur',
-    active: 'bg-[#8df0c8] text-[#07111f]',
-    idle: 'text-slate-200 hover:bg-white/10 hover:text-white',
-    cta: 'rounded-full bg-[#8df0c8] text-[#07111f] hover:bg-[#77dfb8]',
-    mobile: 'border-t border-white/10 bg-[#09101d]/96',
+    shell: 'border-b border-transparent bg-transparent text-[#280905]',
+    logo: 'rounded-[1.35rem] border border-[rgba(40,9,5,0.1)] bg-white/90 shadow-[0_16px_48px_rgba(40,9,5,0.1)] backdrop-blur',
+    active: 'bg-[#280905] text-[#fff4ec]',
+    idle: 'text-[#5c2f28] hover:bg-[#fff0ea] hover:text-[#280905]',
+    cta: 'rounded-full bg-[#c3110c] text-white hover:bg-[#740a03]',
+    mobile: 'border-t border-[rgba(40,9,5,0.08)] bg-[#fffdfb]/98',
   },
   'utility-bar': {
     shell: 'border-b border-[#d7deca] bg-[#f4f6ef]/94 text-[#1f2617] backdrop-blur-xl',
@@ -97,7 +97,11 @@ export function Navbar() {
   const { isAuthenticated } = useAuth()
   const { recipe } = getFactoryState()
 
-  const navigation = useMemo(() => SITE_CONFIG.tasks.filter((task) => task.enabled && task.key !== 'profile'), [])
+  const hiddenNavKeys = useMemo(() => new Set<TaskKey>([...navbarHiddenTaskKeys]), [])
+  const navigation = useMemo(
+    () => SITE_CONFIG.tasks.filter((task) => task.enabled && task.key !== 'profile' && !hiddenNavKeys.has(task.key)),
+    [hiddenNavKeys],
+  )
   const primaryNavigation = navigation.slice(0, 5)
   const mobileNavigation = navigation.map((task) => ({
     name: task.label,
@@ -115,8 +119,8 @@ export function Navbar() {
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-4">
             <Link href="/" className="flex shrink-0 items-center gap-3">
-              <div className={cn('flex h-12 w-12 items-center justify-center overflow-hidden p-1.5', palette.logo)}>
-                <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="48" height="48" className="h-full w-full object-contain" />
+              <div className={cn('flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden p-2', palette.logo)}>
+                <img src="/favicon.png?v=202604242" alt={`${SITE_CONFIG.name} logo`} width="64" height="64" className="h-full w-full object-contain" />
               </div>
               <div className="min-w-0 hidden sm:block">
                 <span className="block truncate text-xl font-semibold">{SITE_CONFIG.name}</span>
@@ -136,13 +140,13 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
+            <div className="hidden min-w-0 flex-1 items-center justify-center lg:flex">
             <div className={cn('flex w-full max-w-xl items-center gap-3 rounded-full px-4 py-3', palette.search)}>
               <Search className="h-4 w-4" />
-              <span className="text-sm">Find businesses, spaces, and local services</span>
+              <span className="text-sm">Search images, articles, and every post type</span>
               <div className="ml-auto hidden items-center gap-1 text-xs opacity-75 md:flex">
                 <MapPin className="h-3.5 w-3.5" />
-                Local discovery
+                Discovery
               </div>
             </div>
           </div>
@@ -165,7 +169,7 @@ export function Navbar() {
                 <Button size="sm" asChild className={cn('rounded-full', palette.cta)}>
                   <Link href="/register">
                     <Plus className="mr-1 h-4 w-4" />
-                    Add Listing
+                    Get started
                   </Link>
                 </Button>
               </div>
@@ -182,7 +186,7 @@ export function Navbar() {
             <div className="space-y-2 px-4 py-4">
               <div className={cn('mb-3 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium', palette.search)}>
                 <Search className="h-4 w-4" />
-                Find businesses, spaces, and services
+                Search images, articles, and more
               </div>
               {mobileNavigation.map((item) => {
                 const isActive = pathname.startsWith(item.href)
@@ -210,8 +214,8 @@ export function Navbar() {
       <nav className={cn('mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8', isFloating ? 'h-24 pt-4' : 'h-20')}>
         <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-7">
           <Link href="/" className="flex shrink-0 items-center gap-3 whitespace-nowrap pr-2">
-            <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden p-1.5', style.logo)}>
-              <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="48" height="48" className="h-full w-full object-contain" />
+            <div className={cn('flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden p-2', style.logo)}>
+              <img src="/favicon.png?v=202604242" alt={`${SITE_CONFIG.name} logo`} width="64" height="64" className="h-full w-full object-contain" />
             </div>
             <div className="min-w-0 hidden sm:block">
               <span className="block truncate text-xl font-semibold">{SITE_CONFIG.name}</span>
@@ -308,7 +312,7 @@ export function Navbar() {
 
       {isFloating && primaryTask ? (
         <div className="mx-auto hidden max-w-7xl px-4 pb-3 sm:px-6 lg:block lg:px-8">
-          <Link href={primaryTask.route} className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-200 backdrop-blur hover:bg-white/12">
+          <Link href={primaryTask.route} className="inline-flex items-center gap-2 rounded-full border border-[rgba(40,9,5,0.1)] bg-white/85 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#5c2f28] shadow-sm backdrop-blur hover:bg-[#fff0ea]">
             Featured surface
             <span>{primaryTask.label}</span>
             <ChevronRight className="h-3.5 w-3.5" />

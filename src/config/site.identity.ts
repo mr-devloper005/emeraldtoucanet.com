@@ -1,10 +1,10 @@
 export const siteIdentity = {
   code: process.env.NEXT_PUBLIC_SITE_CODE || 'hqz8w5459i',
   name: process.env.NEXT_PUBLIC_SITE_NAME || 'Emeraldtoucanet',
-  tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Image Sharing platform',
+  tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE || 'Image sharing and visual discovery',
   description:
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-    'A visual discovery platform for image-led posts, galleries, and creative media browsing.',
+    'A visual discovery home for image-led posts, galleries, and creative media browsing.',
   domain: process.env.NEXT_PUBLIC_SITE_DOMAIN || 'emeraldtoucanet.com',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://emeraldtoucanet.com',
   ogImage: process.env.NEXT_PUBLIC_SITE_OG_IMAGE || '/og-default.png',
