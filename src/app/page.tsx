@@ -9,9 +9,10 @@ import { TaskPostCard } from '@/components/shared/task-post-card'
 import { SITE_CONFIG, type TaskKey } from '@/lib/site-config'
 import { buildPageMetadata } from '@/lib/seo'
 import { fetchTaskPosts } from '@/lib/task-data'
-import { siteContent } from '@/config/site.content'
+import { HomeGalleryWall } from '@/components/home/home-gallery-wall'
+import { homeHeroShowcase, siteContent } from '@/config/site.content'
 import { getFactoryState } from '@/design/factory/get-factory-state'
-import { getProductKind, type ProductKind } from '@/design/factory/get-product-kind'
+import { getProductKind } from '@/design/factory/get-product-kind'
 import type { SitePost } from '@/lib/site-connector'
 import { HOME_PAGE_OVERRIDE_ENABLED, HomePageOverride } from '@/overrides/home-page'
 
@@ -114,14 +115,14 @@ function getEditorialTone() {
 
 function getVisualTone() {
   return {
-    shell: 'bg-[#07101f] text-white',
-    panel: 'border border-white/10 bg-[rgba(11,18,31,0.78)] shadow-[0_28px_80px_rgba(0,0,0,0.35)]',
-    soft: 'border border-white/10 bg-white/6',
-    muted: 'text-slate-300',
-    title: 'text-white',
-    badge: 'bg-[#8df0c8] text-[#07111f]',
-    action: 'bg-[#8df0c8] text-[#07111f] hover:bg-[#77dfb8]',
-    actionAlt: 'border border-white/10 bg-white/6 text-white hover:bg-white/10',
+    shell: 'bg-[#fffdfb] text-[#280905]',
+    panel: 'border border-[rgba(40,9,5,0.08)] bg-white shadow-[0_28px_90px_rgba(40,9,5,0.08)]',
+    soft: 'border border-[rgba(116,10,3,0.12)] bg-[#fff5f0]',
+    muted: 'text-[#5c2f28]',
+    title: 'text-[#280905]',
+    badge: 'bg-[#280905] text-[#fff4ec]',
+    action: 'bg-[#c3110c] text-white shadow-[0_14px_40px_rgba(195,17,12,0.35)] hover:bg-[#740a03]',
+    actionAlt: 'border border-[rgba(40,9,5,0.12)] bg-white text-[#280905] hover:bg-[#fff0ea]',
   }
 }
 
@@ -343,68 +344,161 @@ function EditorialHome({ primaryTask, articlePosts, supportTasks }: { primaryTas
   )
 }
 
-function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { primaryTask?: EnabledTask; imagePosts: SitePost[]; profilePosts: SitePost[]; articlePosts: SitePost[] }) {
+function VisualHome({ imagePosts, profilePosts }: { imagePosts: SitePost[]; profilePosts: SitePost[] }) {
   const tone = getVisualTone()
-  const gallery = imagePosts.length ? imagePosts.slice(0, 5) : articlePosts.slice(0, 5)
-  const creators = profilePosts.slice(0, 3)
+  const gallery = imagePosts.slice(0, 5)
+  const supportProfiles = profilePosts.slice(0, 3)
+  const imageTaskKey: TaskKey = 'image'
 
   return (
     <main className={tone.shell}>
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          <div>
-            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] ${tone.badge}`}>
-              <ImageIcon className="h-3.5 w-3.5" />
-              Visual publishing system
-            </span>
-            <h1 className={`mt-6 max-w-4xl text-5xl font-semibold tracking-[-0.06em] sm:text-6xl ${tone.title}`}>
-              Image-led discovery with creator profiles and a more gallery-like browsing rhythm.
-            </h1>
-            <p className={`mt-6 max-w-2xl text-base leading-8 ${tone.muted}`}>{SITE_CONFIG.description}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={primaryTask?.route || '/images'} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.action}`}>
-                Open gallery
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/profile" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.actionAlt}`}>
-                Meet creators
-              </Link>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {gallery.slice(0, 5).map((post, index) => (
-              <Link
-                key={post.id}
-                href={getTaskHref(resolveTaskKey(post.task, 'image'), post.slug)}
-                className={index === 0 ? `col-span-2 row-span-2 overflow-hidden rounded-[2.4rem] ${tone.panel}` : `overflow-hidden rounded-[1.8rem] ${tone.soft}`}
-              >
-                <div className={index === 0 ? 'relative h-[360px]' : 'relative h-[170px]'}>
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+      <section className="border-b border-[rgba(40,9,5,0.06)] bg-[linear-gradient(180deg,#ffffff_0%,#fff7f2_100%)]">
+        <div className="mx-auto max-w-6xl px-4 py-16 text-center sm:px-6 lg:px-8 lg:py-20">
+          <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.28em] ${tone.badge}`}>
+            <ImageIcon className="h-3.5 w-3.5 text-[#e6501b]" />
+            {siteContent.hero.badge}
+          </span>
+          <h1 className={`mx-auto mt-7 max-w-3xl text-4xl font-semibold tracking-[-0.05em] sm:text-5xl lg:text-[3.35rem] lg:leading-[1.08] ${tone.title}`}>
+            {siteContent.hero.title[0]} <span className="text-[#c3110c]">{siteContent.hero.title[1]}</span>
+          </h1>
+          <p className={`mx-auto mt-6 max-w-2xl text-base leading-relaxed sm:text-lg ${tone.muted}`}>{siteContent.hero.description}</p>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className={`rounded-[2rem] p-7 ${tone.panel}`}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Visual notes</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em]">Larger media surfaces, fewer boxes, stronger pacing.</h2>
-            <p className={`mt-4 max-w-2xl text-sm leading-8 ${tone.muted}`}>This product avoids business-directory density and publication framing. The homepage behaves more like a visual board, with profile surfaces and imagery leading the experience.</p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {creators.map((post) => (
-              <Link key={post.id} href={`/profile/${post.slug}`} className={`rounded-[1.8rem] p-5 ${tone.soft}`}>
-                <div className="relative h-40 overflow-hidden rounded-[1.2rem]">
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
+          <div className="mx-auto mt-12 grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {homeHeroShowcase.map((item) => (
+              <figure
+                key={item.src}
+                className="overflow-hidden rounded-2xl border border-[rgba(40,9,5,0.08)] bg-white text-left shadow-[0_14px_40px_rgba(40,9,5,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(40,9,5,0.1)]"
+              >
+                <div className="relative aspect-[4/5] w-full bg-[#f0e6e0]">
+                  <img
+                    src={item.src}
+                    alt={item.caption}
+                    width={720}
+                    height={900}
+                    loading="eager"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">{post.title}</h3>
-                <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>{post.summary || 'Creator profile and visual identity surface.'}</p>
-              </Link>
+                <figcaption className="space-y-1 p-3.5">
+                  <p className="text-sm font-semibold leading-snug text-[#280905]">{item.caption}</p>
+                  <p className="text-xs leading-relaxed text-[#5c2f28]/88">{item.location}</p>
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#740a03]/55">Library photo</p>
+                </figcaption>
+              </figure>
             ))}
+          </div>
+
+          <div className="mt-10 flex flex-wrap justify-center">
+            <Link href={siteContent.hero.primaryCta.href} className={`inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold transition ${tone.action}`}>
+              {siteContent.hero.primaryCta.label}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
+
+      <HomeGalleryWall tone="light" id="hero-gallery-wall" />
+
+      <section className="border-b border-[rgba(40,9,5,0.06)] bg-[linear-gradient(180deg,#ffffff_0%,#fff7f2_100%)]">
+        <div className="mx-auto max-w-6xl px-4 pb-16 pt-2 text-center sm:px-6 lg:px-8 lg:pb-20">
+          <Link
+            href="/search"
+            className="mx-auto flex max-w-2xl items-center gap-3 rounded-full border border-[rgba(40,9,5,0.1)] bg-white px-5 py-3.5 text-left text-sm text-[#5c2f28] shadow-[0_12px_40px_rgba(40,9,5,0.06)] transition hover:border-[#c3110c]/35"
+          >
+            <Globe2 className="h-4 w-4 shrink-0 text-[#c3110c]" />
+            <span className="flex-1 truncate">{siteContent.hero.searchPlaceholder}</span>
+            <span className="rounded-full bg-[#fff0ea] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#740a03]">Search</span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-16">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#740a03]/80">From the community</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#280905]">Latest uploads</h2>
+          <p className={`mt-3 max-w-xl text-sm leading-7 ${tone.muted}`}>
+            When members post, their frames land here. If the feed is quiet, browse the gallery to see everything in one place.
+          </p>
+        </div>
+
+        {gallery.length ? (
+          <div className="mt-10 grid gap-4 sm:grid-cols-4 sm:grid-rows-2 lg:gap-5">
+            {gallery.slice(0, 5).map((post, index) => (
+              <Link
+                key={post.id}
+                href={getTaskHref(resolveTaskKey(post.task, imageTaskKey), post.slug)}
+                className={
+                  index === 0
+                    ? `group relative overflow-hidden rounded-[2rem] border border-[rgba(40,9,5,0.08)] bg-white shadow-[0_24px_70px_rgba(40,9,5,0.08)] sm:col-span-2 sm:row-span-2`
+                    : `group relative overflow-hidden rounded-[1.65rem] border border-[rgba(40,9,5,0.06)] bg-[#fff5f0] shadow-sm`
+                }
+              >
+                <div className={index === 0 ? 'relative aspect-[4/3] sm:min-h-[340px]' : 'relative h-36 sm:h-40'}>
+                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover transition duration-500 group-hover:scale-[1.03]" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#280905]/55 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
+                </div>
+                {index === 0 ? (
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/80">Featured frame</p>
+                    <p className="mt-2 text-xl font-semibold leading-snug">{post.title}</p>
+                  </div>
+                ) : null}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {homeHeroShowcase.map((item) => (
+              <Link
+                key={`fallback-${item.src}`}
+                href="/images"
+                className="group overflow-hidden rounded-[1.65rem] border border-[rgba(40,9,5,0.08)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="relative aspect-[4/3] w-full bg-[#f0e6e0]">
+                  <img
+                    src={item.src}
+                    alt={item.caption}
+                    width={720}
+                    height={540}
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                  />
+                </div>
+                <div className="p-4">
+                  <p className="text-sm font-semibold text-[#280905]">{item.caption}</p>
+                  <p className="mt-1 text-xs text-[#5c2f28]/85">{item.location}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {supportProfiles.length ? (
+        <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#280905]">Creators on the wall</h2>
+            <Link href="/profile" className="text-sm font-semibold text-[#c3110c] hover:text-[#740a03]">
+              Profiles
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {supportProfiles.map((post) => (
+              <Link key={post.id} href={`/profile/${post.slug}`} className={`rounded-[1.8rem] p-5 ${tone.soft}`}>
+                <div className="relative h-40 overflow-hidden rounded-[1.25rem] border border-[rgba(40,9,5,0.06)]">
+                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-[#280905]">{post.title}</h3>
+                <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>{post.summary || 'Public profile'}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </main>
   )
 }
@@ -537,9 +631,7 @@ export default async function HomePage() {
       {productKind === 'editorial' ? (
         <EditorialHome primaryTask={primaryTask} articlePosts={articlePosts} supportTasks={supportTasks} />
       ) : null}
-      {productKind === 'visual' ? (
-        <VisualHome primaryTask={primaryTask} imagePosts={imagePosts} profilePosts={profilePosts} articlePosts={articlePosts} />
-      ) : null}
+      {productKind === 'visual' ? <VisualHome imagePosts={imagePosts} profilePosts={profilePosts} /> : null}
       {productKind === 'curation' ? (
         <CurationHome primaryTask={primaryTask} bookmarkPosts={bookmarkPosts} profilePosts={profilePosts} articlePosts={articlePosts} />
       ) : null}

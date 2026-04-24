@@ -19,7 +19,7 @@ export const siteTaskDefinitions = [
     key: 'article',
     label: 'Articles',
     route: '/articles',
-    description: 'Insights, blogs, and long-form content.',
+    description: 'Long reads and notes that pair with the gallery.',
     contentType: 'article',
     enabled: false,
   },

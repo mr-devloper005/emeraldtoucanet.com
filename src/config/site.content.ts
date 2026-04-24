@@ -1,76 +1,123 @@
 import type { TaskKey } from '@/lib/site-config'
+import { siteIdentity } from '@/config/site.identity'
+
+/** Task routes hidden from the main navbar (image-only chrome; logo + search + auth remain). */
+export const navbarHiddenTaskKeys = ['image', 'article'] as const satisfies readonly TaskKey[]
+
+/** Curated photography for the homepage (Unsplash — editorial-style captions). */
+export const homeHeroShowcase = [
+  {
+    src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=720&q=82',
+    caption: 'First light on the ridgeline',
+    location: 'Julian Alps · Slovenia',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=720&q=82',
+    caption: 'Clouds rolling over the summit',
+    location: 'Annapurna region · Nepal',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=720&q=82',
+    caption: 'Sun through the forest aisle',
+    location: 'Black Forest · Germany',
+  },
+  {
+    src: 'https://picsum.photos/seed/emerald-tide-hero/720/900',
+    caption: 'Slow shutter on the tide',
+    location: 'Big Sur coast · California',
+  },
+] as const
+
+const galleryWallCaptions = [
+  'Blue hour over the harbor',
+  'Desert road at long lens',
+  'Rain on cobblestones',
+  'Alpine wind on the ridge',
+  'Studio light on texture',
+  'Coastal fog lifting',
+  'City grid from above',
+  'Wildflowers after rain',
+  'Snow line at treeline',
+  'Dunes at last light',
+  'Forest floor in spring',
+  'Reflections in still water',
+] as const
+
+const galleryWallPlaces = [
+  'Reykjavík · Iceland',
+  'Namib Desert · Namibia',
+  'Lisbon · Portugal',
+  'Banff · Canada',
+  'Brooklyn · USA',
+  'Oregon coast · USA',
+  'Tokyo · Japan',
+  'Tuscany · Italy',
+  'Chamonix · France',
+  'Western Australia',
+  'Vancouver Island · Canada',
+  'Scottish Highlands',
+] as const
+
+/**
+ * Homepage “More frames” grid — fewer tiles, fixed 480×640 + stable seeds so nothing 404s or renders blank.
+ * (Varying width/height per cell was causing occasional empty Picsum responses.)
+ */
+export const homeGalleryWall: { src: string; caption: string; location: string }[] = Array.from({ length: 24 }, (_, i) => ({
+  src: `https://picsum.photos/seed/emeraldwall-${i + 1}/480/640`,
+  caption: galleryWallCaptions[i % galleryWallCaptions.length],
+  location: galleryWallPlaces[i % galleryWallPlaces.length],
+}))
 
 export const siteContent = {
   navbar: {
-    tagline: 'Independent reading platform',
+    tagline: 'Gallery-first visual publishing',
   },
   footer: {
-    tagline: 'Stories, resources, and discoverable posts',
+    tagline: 'Image sharing and visual discovery',
   },
   hero: {
-    badge: 'Latest stories and visuals',
-    title: ['A thoughtful home for', 'stories, visuals, and discovery.'],
+    badge: 'Fresh frames and posts',
+    title: ['Bring your best visuals', 'to the surface.'],
     description:
-      'Explore fresh articles, image-led posts, and discoverable content across the platform through a calmer and clearer browsing experience.',
+      'A calmer home for photography and visual posts—large tiles, clear captions, and a gallery pace built for sharing work that deserves the screen.',
     primaryCta: {
-      label: 'Read latest stories',
-      href: '/articles',
-    },
-    secondaryCta: {
-      label: 'Explore visuals',
+      label: 'Open the gallery',
       href: '/images',
     },
-    searchPlaceholder: 'Search stories, visuals, listings, and more',
+    searchPlaceholder: 'Search images and visual posts',
     focusLabel: 'Focus',
-    featureCardBadge: 'latest cover rotation',
-    featureCardTitle: 'Latest posts shape the visual identity of the homepage.',
+    featureCardBadge: 'cover rotation',
+    featureCardTitle: 'Recent uploads set the tone of the homepage.',
     featureCardDescription:
-      'Recent images and stories stay at the center of the experience without changing any core platform behavior.',
+      'New images and posts stay up front while the rest of the experience stays one click away.',
   },
   home: {
     metadata: {
-      title: 'Stories, visuals, and discoverable content',
-      description:
-        'Explore articles, images, listings, and curated posts through a cleaner reading-first experience.',
-      openGraphTitle: 'Stories, visuals, and discoverable content',
-      openGraphDescription:
-        'Discover articles, visual posts, and connected content through a calmer reading-first experience.',
-      keywords: ['story platform', 'article site', 'visual content', 'content discovery'],
+      title: 'Visual gallery and image sharing',
+      description: 'A professional image-sharing home—photography, galleries, and visual posts with a gallery-first layout.',
+      openGraphTitle: 'Visual gallery and image sharing',
+      openGraphDescription: 'Discover image posts and visual stories in one cohesive gallery experience.',
+      keywords: ['image sharing', 'visual gallery', 'photography', 'creative posts', siteIdentity.name],
     },
-    introBadge: 'About the platform',
-    introTitle: 'Built for reading, browsing, and connecting different kinds of content.',
-    introParagraphs: [
-      'This site brings together article-style reading, visual browsing, and structured discovery so visitors can move naturally between different content types.',
-      'Instead of separating stories, visuals, and supporting resources into disconnected surfaces, the platform keeps them connected in one place with consistent navigation and easier exploration.',
-      'Whether someone starts with a story, an image-led post, a listing, or a resource page, they can keep discovering related content without friction.',
-    ],
-    sideBadge: 'At a glance',
-    sidePoints: [
-      'Reading-first homepage with stronger emphasis on stories and imagery.',
-      'Connected sections for articles, visuals, listings, and supporting resources.',
-      'Cleaner browsing rhythm designed to make exploration feel easier.',
-      'Lightweight interactions that keep the experience fast and readable.',
-    ],
     primaryLink: {
-      label: 'Browse articles',
-      href: '/articles',
+      label: 'Browse images',
+      href: '/images',
     },
     secondaryLink: {
-      label: 'See visuals',
-      href: '/images',
+      label: 'About',
+      href: '/about',
     },
   },
   cta: {
-    badge: 'Start exploring',
-    title: 'Explore articles, visuals, and resources through one connected experience.',
-    description:
-      'Move between articles, image-led posts, listings, and resources through one clearer and more connected visual system.',
+    badge: 'Join the studio',
+    title: 'Publish frames and keep your gallery discoverable.',
+    description: 'Create an account to upload images, organize posts, and share your work in one professional surface.',
     primaryCta: {
-      label: 'Get Started Free',
+      label: 'Create account',
       href: '/register',
     },
     secondaryCta: {
-      label: 'Contact Sales',
+      label: 'Contact',
       href: '/contact',
     },
   },
@@ -80,8 +127,8 @@ export const siteContent = {
 
 export const taskPageMetadata: Record<Exclude<TaskKey, 'comment' | 'org' | 'social'>, { title: string; description: string }> = {
   article: {
-    title: 'Articles and stories',
-    description: 'Read articles, stories, guides, and long-form posts across topics and interests.',
+    title: 'Articles and long reads',
+    description: 'Essays, notes, and stories that complement the visual gallery.',
   },
   listing: {
     title: 'Listings and discoverable pages',
@@ -93,7 +140,7 @@ export const taskPageMetadata: Record<Exclude<TaskKey, 'comment' | 'org' | 'soci
   },
   image: {
     title: 'Images and visual posts',
-    description: 'Explore image-led posts, galleries, and visual stories from across the platform.',
+    description: 'Explore image-led posts, galleries, and visual stories in one gallery-first experience.',
   },
   profile: {
     title: 'Profiles and public pages',
@@ -121,22 +168,22 @@ export const taskIntroCopy: Record<
       'Browse by category to compare posts in context, discover related content, and move between formats without losing your place.',
     ],
     links: [
-      { label: 'Read articles', href: '/articles' },
-      { label: 'Explore classifieds', href: '/classifieds' },
-      { label: 'View profiles', href: '/profile' },
+      { label: 'Gallery', href: '/images' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'Classifieds', href: '/classifieds' },
     ],
   },
   article: {
-    title: 'Articles, stories, and long-form reading',
+    title: 'Articles beside the gallery',
     paragraphs: [
-      'This section is built for stories, explainers, guides, and long-form reading across topics and interests.',
-      'Articles connect with listings, images, resources, and other content types so deeper reading can lead naturally into related discovery.',
-      'Use this section to browse thoughtful posts, revisit useful writing, and move into supporting content when you want more context.',
+      'Long-form writing lives here with calmer typography and room for narrative—separate from the image grid but on the same platform.',
+      'Use articles to add context, process notes, or stories behind the visuals visitors discover first.',
+      'Jump back into the gallery any time; routes and behavior stay consistent with the base system.',
     ],
     links: [
-      { label: 'Explore listings', href: '/listings' },
       { label: 'Open images', href: '/images' },
-      { label: 'Browse resources', href: '/pdf' },
+      { label: 'Search everything', href: '/search' },
+      { label: 'PDF library', href: '/pdf' },
     ],
   },
   classified: {
@@ -147,23 +194,19 @@ export const taskIntroCopy: Record<
       'Browse by category to find announcements quickly, then continue into related sections when you need more detail.',
     ],
     links: [
-      { label: 'Business listings', href: '/listings' },
-      { label: 'Read articles', href: '/articles' },
-      { label: 'View profiles', href: '/profile' },
+      { label: 'Images', href: '/images' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'Listings', href: '/listings' },
     ],
   },
   image: {
     title: 'Image-led posts and visual stories',
     paragraphs: [
-      'Images take the lead in this section through galleries, visual posts, and story-led content where imagery carries the experience.',
-      'These posts connect with articles, listings, and other sections so visuals can act as entry points into deeper content.',
-      'Browse the latest visual updates, then continue into related stories or supporting pages for more context.',
+      'This lane is tuned for photography, renders, and visual drops—large media, tight metadata, and a gallery pace.',
+      'Browse in a masonry rhythm built for visuals first: every tile is meant to carry a strong frame.',
+      'Filters and cards use the same underlying feeds and metadata as elsewhere on the site; only the presentation changes here.',
     ],
-    links: [
-      { label: 'Read articles', href: '/articles' },
-      { label: 'Explore listings', href: '/listings' },
-      { label: 'Open classifieds', href: '/classifieds' },
-    ],
+    links: [],
   },
   profile: {
     title: 'Profiles, identities, and public pages',
@@ -173,22 +216,22 @@ export const taskIntroCopy: Record<
       'Browse profiles to understand people and brands more clearly, then continue into related content from the same source.',
     ],
     links: [
-      { label: 'Open listings', href: '/listings' },
-      { label: 'Read articles', href: '/articles' },
-      { label: 'Browse images', href: '/images' },
+      { label: 'Gallery', href: '/images' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'Listings', href: '/listings' },
     ],
   },
   sbm: {
     title: 'Curated links and bookmarked resources',
     paragraphs: [
-      'This section collects useful links, references, tools, and saved resources in a text-first browsing format.',
-      'Bookmarks stay connected to the rest of the platform, making it easier to move from a saved link into related stories, listings, or resources.',
+      'This section collects useful links, references, tools, and saved resources in a compact, shelf-like layout.',
+      'Bookmarks stay connected to the rest of the platform, making it easier to move from a saved link into related stories or media.',
       'Use this section to organize helpful sources and discover connected content without leaving the broader site experience.',
     ],
     links: [
-      { label: 'Browse articles', href: '/articles' },
-      { label: 'Explore listings', href: '/listings' },
-      { label: 'Open PDFs', href: '/pdf' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'Images', href: '/images' },
+      { label: 'PDFs', href: '/pdf' },
     ],
   },
   pdf: {
@@ -199,9 +242,9 @@ export const taskIntroCopy: Record<
       'Browse by category to find relevant files quickly, then continue into related sections when you want more context.',
     ],
     links: [
-      { label: 'Read articles', href: '/articles' },
-      { label: 'See listings', href: '/listings' },
-      { label: 'Explore profiles', href: '/profile' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'Gallery', href: '/images' },
+      { label: 'Profiles', href: '/profile' },
     ],
   },
   social: {
@@ -212,9 +255,9 @@ export const taskIntroCopy: Record<
       'Use these posts as lightweight entry points into the broader site experience.',
     ],
     links: [
-      { label: 'Open listings', href: '/listings' },
-      { label: 'Read articles', href: '/articles' },
-      { label: 'View PDFs', href: '/pdf' },
+      { label: 'Images', href: '/images' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'PDFs', href: '/pdf' },
     ],
   },
   comment: {
@@ -225,9 +268,9 @@ export const taskIntroCopy: Record<
       'Use comments as supporting context beneath stories, then continue exploring related content from the same topic area.',
     ],
     links: [
-      { label: 'Explore articles', href: '/articles' },
-      { label: 'View listings', href: '/listings' },
-      { label: 'See classifieds', href: '/classifieds' },
+      { label: 'Articles', href: '/articles' },
+      { label: 'Gallery', href: '/images' },
+      { label: 'Classifieds', href: '/classifieds' },
     ],
   },
   org: {
@@ -238,8 +281,8 @@ export const taskIntroCopy: Record<
       'Connect organization pages with related content to build a clearer and more unified site presence.',
     ],
     links: [
-      { label: 'Business listings', href: '/listings' },
-      { label: 'Read articles', href: '/articles' },
+      { label: 'Listings', href: '/listings' },
+      { label: 'Articles', href: '/articles' },
       { label: 'PDF library', href: '/pdf' },
     ],
   },
