@@ -43,6 +43,11 @@ function getTone(kind: ReturnType<typeof getProductKind>) {
   }
 }
 
+const contactEmails = (process.env.NEXT_PUBLIC_CONTACT_EMAILS || '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean)
+
 export default function ContactPage() {
   if (CONTACT_PAGE_OVERRIDE_ENABLED) {
     return <ContactPageOverride />
@@ -85,6 +90,20 @@ export default function ContactPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Contact {SITE_CONFIG.name}</p>
             <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em]">A support page that matches the product, not a generic contact form.</h1>
             <p className={`mt-5 max-w-2xl text-sm leading-8 ${tone.muted}`}>Tell us what you are trying to publish, fix, or launch. We will route it through the right lane instead of forcing every request into the same support bucket.</p>
+            {contactEmails.length ? (
+              <div className="mt-8 flex flex-wrap gap-3">
+                {contactEmails.map((email) => (
+                  <a
+                    key={email}
+                    href={`mailto:${email}`}
+                    className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.action}`}
+                  >
+                    <Mail className="h-4 w-4" />
+                    {email}
+                  </a>
+                ))}
+              </div>
+            ) : null}
             <div className="mt-8 space-y-4">
               {lanes.map((lane) => (
                 <div key={lane.title} className={`rounded-[1.6rem] p-5 ${tone.soft}`}>
@@ -98,6 +117,24 @@ export default function ContactPage() {
 
           <div className={`rounded-[2rem] p-7 ${tone.panel}`}>
             <h2 className="text-2xl font-semibold">Send a message</h2>
+            {contactEmails.length ? (
+              <div className={`mt-4 rounded-[1.4rem] p-4 ${tone.soft}`}>
+                <p className="text-sm font-semibold">Prefer email?</p>
+                <p className={`mt-1 text-sm ${tone.muted}`}>These buttons are controlled through `NEXT_PUBLIC_CONTACT_EMAILS` in your `.env` file.</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {contactEmails.map((email) => (
+                    <a
+                      key={`panel-${email}`}
+                      href={`mailto:${email}`}
+                      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${tone.action}`}
+                    >
+                      <Mail className="h-4 w-4" />
+                      Email {email}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             <form className="mt-6 grid gap-4">
               <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="Your name" />
               <input className="h-12 rounded-xl border border-current/10 bg-transparent px-4 text-sm" placeholder="Email address" />

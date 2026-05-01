@@ -13,6 +13,10 @@ type ListingContent = {
   category?: string
   description?: string
   email?: string
+  website?: string
+  companyName?: string
+  brandName?: string
+  name?: string
 }
 
 const stripHtml = (value?: string | null) =>
@@ -27,7 +31,7 @@ const getExcerpt = (value?: string | null, maxLength = 140) => {
   const text = stripHtml(value)
   if (!text) return ''
   if (text.length <= maxLength) return text
-  return `${text.slice(0, maxLength).trimEnd()}…`
+  return `${text.slice(0, maxLength).trimEnd()}...`
 }
 
 const getContent = (post: SitePost): ListingContent => {
@@ -109,6 +113,7 @@ export function TaskPostCard({
   const imageAspect = variant === 'image' ? 'aspect-[4/5]' : variant === 'article' ? 'aspect-[16/10]' : variant === 'pdf' ? 'aspect-[4/5]' : variant === 'classified' ? 'aspect-[16/11]' : 'aspect-[4/3]'
   const altText = `${post.title} ${category} ${variant === 'listing' ? 'business listing' : variant} image`
   const imageSizes = variant === 'article' ? '(max-width: 640px) 90vw, (max-width: 1024px) 48vw, 420px' : variant === 'image' ? '(max-width: 640px) 82vw, (max-width: 1024px) 34vw, 320px' : '(max-width: 640px) 85vw, (max-width: 1024px) 42vw, 340px'
+  const profileLabel = content.brandName || content.companyName || content.name || post.title
 
   const { recipe } = getFactoryState()
   const isDirectoryProduct = recipe.homeLayout === 'listing-home' || recipe.homeLayout === 'classified-home'
@@ -178,6 +183,67 @@ export function TaskPostCard({
           <h3 className={`mt-3 line-clamp-2 text-lg font-semibold leading-snug group-hover:opacity-85 ${visualVariant.title}`}>{post.title}</h3>
           <p className={`mt-2 line-clamp-3 text-sm leading-7 ${visualVariant.muted}`}>{getExcerpt(content.description || post.summary, compact ? 120 : 180) || 'Explore this bookmark.'}</p>
           {content.email ? <div className={`mt-3 inline-flex items-center gap-1 text-xs ${visualVariant.muted}`}><Mail className="h-3.5 w-3.5" />{content.email}</div> : null}
+        </div>
+      </Link>
+    )
+  }
+
+  if (variant === 'image') {
+    return (
+      <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/12 bg-white/6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-1 hover:bg-white/10">
+        <div className="relative aspect-[4/5] overflow-hidden bg-[#140604]">
+          <ContentImage src={image} alt={altText} fill sizes={imageSizes} quality={75} className="object-cover transition-transform duration-700 group-hover:scale-[1.06]" intrinsicWidth={960} intrinsicHeight={1200} />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#120503] via-black/15 to-transparent" />
+          <div className="absolute inset-x-0 top-0 flex items-center justify-between p-4">
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-black/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#fff2ea] backdrop-blur">
+              <Tag className="h-3.5 w-3.5" />
+              {category}
+            </span>
+            <span className="rounded-full border border-white/15 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#ffe1d4] backdrop-blur">
+              Curated frame
+            </span>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#ffd1c1]/85">Image spotlight</p>
+            <h3 className="mt-2 line-clamp-2 text-2xl font-semibold leading-tight text-white">{post.title}</h3>
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col p-5">
+          <p className="line-clamp-3 text-sm leading-7 text-[#f3d8cf]">{getExcerpt(content.description || post.summary, compact ? 110 : 150) || 'A visual post arranged for faster scanning and stronger image-first browsing.'}</p>
+          <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-[#ffd8ca]/82">
+            {content.location ? <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{content.location}</span> : null}
+            {content.email ? <span className="inline-flex items-center gap-1"><Mail className="h-3.5 w-3.5" />{content.email}</span> : null}
+          </div>
+          <div className="mt-auto pt-5 text-sm font-semibold text-[#fff1e7]">Open image story</div>
+        </div>
+      </Link>
+    )
+  }
+
+  if (variant === 'profile') {
+    return (
+      <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-[rgba(40,9,5,0.1)] bg-[linear-gradient(180deg,#fffdfb_0%,#fff2eb_100%)] text-[#280905] shadow-[0_22px_70px_rgba(40,9,5,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_80px_rgba(40,9,5,0.14)]">
+        <div className="grid gap-0 md:grid-cols-[0.82fr_1.18fr]">
+          <div className="relative min-h-[260px] overflow-hidden bg-[#f4e1d7]">
+            <ContentImage src={image} alt={altText} fill sizes="(max-width: 768px) 100vw, 320px" quality={75} className="object-cover transition-transform duration-700 group-hover:scale-[1.05]" intrinsicWidth={800} intrinsicHeight={960} />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#2b130d]/55 via-transparent to-transparent" />
+            <div className="absolute left-4 top-4">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#280905] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#fff4ec]">
+                <Tag className="h-3.5 w-3.5" />
+                {category}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-1 flex-col p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[#8c5c4a]">Profile feature</p>
+            <h3 className="mt-3 line-clamp-2 text-2xl font-semibold leading-tight text-[#280905]">{profileLabel}</h3>
+            <p className="mt-3 line-clamp-4 text-sm leading-7 text-[#6a4033]">{getExcerpt(content.description || post.summary, compact ? 140 : 200) || 'Explore this profile, background, and trust signals in a more identity-first layout.'}</p>
+            <div className="mt-5 flex flex-wrap gap-3 text-xs text-[#8c5c4a]">
+              {content.location ? <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{content.location}</span> : null}
+              {content.email ? <span className="inline-flex items-center gap-1"><Mail className="h-3.5 w-3.5" />{content.email}</span> : null}
+            </div>
+            <div className="mt-auto pt-6 text-sm font-semibold text-[#280905]">View profile</div>
+          </div>
         </div>
       </Link>
     )

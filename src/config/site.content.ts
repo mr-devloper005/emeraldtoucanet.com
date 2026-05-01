@@ -70,7 +70,7 @@ export const homeGalleryWall: { src: string; caption: string; location: string }
 
 export const siteContent = {
   navbar: {
-    tagline: 'Gallery-first visual publishing',
+    tagline: '',
   },
   footer: {
     tagline: 'Image sharing and visual discovery',

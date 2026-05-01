@@ -28,9 +28,9 @@ export const getPostTaskKey = (post: SitePost): TaskKey | null => {
 export const fetchTaskPosts = async (
   task: TaskKey,
   limit = 8,
-  options?: { allowMockFallback?: boolean; fresh?: boolean }
+  options?: { allowMockFallback?: boolean; fresh?: boolean; category?: string }
 ) => {
-  const allowMockFallback = options?.allowMockFallback ?? process.env.NEXT_PUBLIC_USE_MOCK_CONTENT === "true";
+  const allowMockFallback = options?.allowMockFallback ?? false;
   const type = getTaskContentType(task);
   const pickTaskPosts = (feed: SiteFeed<SitePost> | null) => {
     if (!feed) return [];
@@ -42,6 +42,17 @@ export const fetchTaskPosts = async (
             : "";
         if (status && status !== "PUBLISHED") return false;
         if (getPostType(post) !== type) return false;
+        
+        // Filter out mock posts by ID pattern
+        if (post.id && typeof post.id === "string" && post.id.includes("-mock-")) return false;
+        
+        // Filter out posts with picsum photos (mock image URLs)
+        const media = Array.isArray(post.media) ? post.media : [];
+        const hasPicsumImage = media.some(item => 
+          item?.url && typeof item.url === "string" && item.url.includes("picsum.photos")
+        );
+        if (hasPicsumImage) return false;
+        
         const content = post.content && typeof post.content === "object" ? post.content : {};
         const category = typeof (content as any).category === "string" ? (content as any).category : "";
         return !category || isValidCategory(category);
@@ -50,12 +61,25 @@ export const fetchTaskPosts = async (
   };
 
   try {
-    const cachedFeed = await fetchSiteFeed(limit * 6, { fresh: options?.fresh });
+    // Fetch all posts without server-side category filtering
+    const feedOptions = { 
+      fresh: options?.fresh,
+      task: task
+    };
+    const cachedFeed = await fetchSiteFeed(limit * 6, { ...feedOptions, fresh: false });
     const cachedPosts = pickTaskPosts(cachedFeed);
-    if (cachedPosts.length) return cachedPosts;
-
-    const freshFeed = await fetchSiteFeed(limit * 6, { fresh: true });
-    const filtered = pickTaskPosts(freshFeed);
+    const freshFeed = await fetchSiteFeed(limit * 6, { ...feedOptions, fresh: true });
+    const freshPosts = pickTaskPosts(freshFeed);
+    const filtered = freshPosts.length ? freshPosts : cachedPosts;
+    
+    // Debug logging
+    console.log('fetchTaskPosts:', { 
+      task, 
+      category: options?.category, 
+      totalFetched: filtered.length,
+      postTitles: filtered.slice(0, 5).map(p => ({ title: p.title, category: (p.content as any)?.category }))
+    });
+    
     return filtered.length || !allowMockFallback
       ? filtered
       : getMockPostsForTask(task).slice(0, limit);
@@ -65,10 +89,26 @@ export const fetchTaskPosts = async (
 };
 
 export const fetchTaskPostBySlug = async (task: TaskKey, slug: string) => {
-  const allowMockFallback = process.env.NEXT_PUBLIC_USE_MOCK_CONTENT === "true";
+  const allowMockFallback = false;
   const type = getTaskContentType(task);
-  const resolveFromFeed = (feed: SiteFeed<SitePost> | null) =>
-    feed?.posts.find((post) => post.slug === slug && getPostType(post) === type) || null;
+  const resolveFromFeed = (feed: SiteFeed<SitePost> | null) => {
+    if (!feed) return null;
+    return feed.posts.find((post) => {
+      if (post.slug !== slug || getPostType(post) !== type) return false;
+      
+      // Filter out mock posts by ID pattern
+      if (post.id && typeof post.id === "string" && post.id.includes("-mock-")) return false;
+      
+      // Filter out posts with picsum photos (mock image URLs)
+      const media = Array.isArray(post.media) ? post.media : [];
+      const hasPicsumImage = media.some(item => 
+        item?.url && typeof item.url === "string" && item.url.includes("picsum.photos")
+      );
+      if (hasPicsumImage) return false;
+      
+      return true;
+    }) || null;
+  };
 
   try {
     const cachedFeed = await fetchSiteFeed(200);

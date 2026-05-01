@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Building2, FileText, Image as ImageIcon, LayoutGrid, Tag, User } from 'lucide-react'
 import { HomeGalleryWall } from '@/components/home/home-gallery-wall'
@@ -42,13 +45,73 @@ const variantShells = {
   'sbm-library': 'bg-[linear-gradient(180deg,#f4f1ec_0%,#e3ddd4_100%)]',
 } as const
 
-export async function TaskListPage({ task, category }: { task: TaskKey; category?: string }) {
+export function TaskListPage({ task, category }: { task: TaskKey; category?: string }) {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setLoading(true);
+        const taskConfig = getTaskConfig(task)
+        const normalizedCategory = category ? normalizeCategory(category) : 'all'
+        
+        // Debug logging
+        console.log('TaskListPage:', { 
+          task, 
+          originalCategory: category, 
+          normalizedCategory, 
+          willPassCategory: normalizedCategory !== 'all' ? normalizedCategory : undefined 
+        });
+        
+        const fetchedPosts = await fetchTaskPosts(task, 30, { category: normalizedCategory !== 'all' ? normalizedCategory : undefined });
+        setPosts(fetchedPosts);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load posts');
+        console.error('Error loading posts:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, [task, category]);
+
   if (TASK_LIST_PAGE_OVERRIDE_ENABLED) {
-    return await TaskListPageOverride({ task, category })
+    return <TaskListPageOverride task={task} category={category} />
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavbarShell />
+        <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p>Loading posts...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavbarShell />
+        <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-red-500">{error}</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   const taskConfig = getTaskConfig(task)
-  const posts = await fetchTaskPosts(task, 30)
   const normalizedCategory = category ? normalizeCategory(category) : 'all'
   const intro = taskIntroCopy[task]
   const baseUrl = SITE_CONFIG.baseUrl.replace(/\/$/, '')
@@ -140,17 +203,26 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
                 <Link href="/search" className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${ui.soft}`}>Open search</Link>
               </div>
             </div>
-            <form className={`grid gap-3 rounded-[2rem] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${ui.soft}`} action={taskConfig?.route || '#'}>
+            <form className={`grid gap-3 rounded-[2rem] p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${ui.soft}`} 
+                  method="GET" 
+                  action={taskConfig?.route || '/listings'}>
               <div>
                 <label className={`text-xs uppercase tracking-[0.2em] ${ui.muted}`}>Category</label>
-                <select name="category" defaultValue={normalizedCategory} className={`mt-2 h-11 w-full rounded-xl px-3 text-sm ${ui.input}`}>
+                <select name="category" value={normalizedCategory} onChange={(e) => {
+                  const form = e.currentTarget.form;
+                  if (form) {
+                    const category = e.target.value;
+                    const baseUrl = taskConfig?.route || '/listings';
+                    const url = category && category !== 'all' ? `${baseUrl}?category=${category}` : baseUrl;
+                    window.location.href = url;
+                  }
+                }} className={`mt-2 h-11 w-full rounded-xl px-3 text-sm ${ui.input}`}>
                   <option value="all">All categories</option>
                   {CATEGORY_OPTIONS.map((item) => (
                     <option key={item.slug} value={item.slug}>{item.name}</option>
                   ))}
                 </select>
               </div>
-              <button type="submit" className={`h-11 rounded-xl text-sm font-medium ${ui.button}`}>Apply filters</button>
             </form>
           </section>
         ) : null}
@@ -165,14 +237,20 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
             <div className={`rounded-[2rem] p-6 ${ui.panel}`}>
               <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${ui.muted}`}>Reading note</p>
               <p className={`mt-4 text-sm leading-7 ${ui.muted}`}>Use category filters to jump between topics without collapsing the page into the same repeated card rhythm used by other task types.</p>
-              <form className="mt-5 flex items-center gap-3" action={taskConfig?.route || '#'}>
-                <select name="category" defaultValue={normalizedCategory} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
+              <form className="mt-5 flex items-center gap-3" 
+                  method="GET" 
+                  action={taskConfig?.route || '/articles'}>
+                <select name="category" value={normalizedCategory} onChange={(e) => {
+                  const category = e.target.value;
+                  const baseUrl = taskConfig?.route || '/articles';
+                  const url = category && category !== 'all' ? `${baseUrl}?category=${category}` : baseUrl;
+                  window.location.href = url;
+                }} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
                   <option value="all">All categories</option>
                   {CATEGORY_OPTIONS.map((item) => (
                     <option key={item.slug} value={item.slug}>{item.name}</option>
                   ))}
                 </select>
-                <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>Apply</button>
               </form>
             </div>
           </section>
@@ -324,14 +402,20 @@ export async function TaskListPage({ task, category }: { task: TaskKey; category
             </div>
             <div className={`rounded-[2rem] p-6 ${ui.panel}`}>
               <p className={`text-xs uppercase tracking-[0.24em] ${ui.muted}`}>Collection filter</p>
-              <form className="mt-4 flex items-center gap-3" action={taskConfig?.route || '#'}>
-                <select name="category" defaultValue={normalizedCategory} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
+              <form className="mt-4 flex items-center gap-3" 
+                  method="GET" 
+                  action={taskConfig?.route || '/sbm'}>
+                <select name="category" value={normalizedCategory} onChange={(e) => {
+                  const category = e.target.value;
+                  const baseUrl = taskConfig?.route || '/sbm';
+                  const url = category && category !== 'all' ? `${baseUrl}?category=${category}` : baseUrl;
+                  window.location.href = url;
+                }} className={`h-11 flex-1 rounded-xl px-3 text-sm ${ui.input}`}>
                   <option value="all">All categories</option>
                   {CATEGORY_OPTIONS.map((item) => (
                     <option key={item.slug} value={item.slug}>{item.name}</option>
                   ))}
                 </select>
-                <button type="submit" className={`h-11 rounded-xl px-4 text-sm font-medium ${ui.button}`}>Apply</button>
               </form>
             </div>
           </section>
