@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { fetchSiteFeed } from "@/lib/site-connector";
 import { buildPostUrl, getPostTaskKey } from "@/lib/task-data";
-import { getMockPostsForTask } from "@/lib/mock-posts";
 import { SITE_CONFIG } from "@/lib/site-config";
 import { TaskPostCard } from "@/components/shared/task-post-card";
 
@@ -37,14 +36,18 @@ export default async function SearchPage({
       ? { fresh: true, category: category || undefined, task: task || undefined }
       : undefined
   );
-  const posts =
-    feed?.posts?.length
-      ? feed.posts
-      : useMaster
-        ? []
-        : SITE_CONFIG.tasks.flatMap((task) => getMockPostsForTask(task.key));
+  const posts = feed?.posts?.length ? feed.posts : [];
 
   const filtered = posts.filter((post) => {
+    // Filter out mock posts by ID pattern
+    if (post.id && typeof post.id === "string" && post.id.includes("-mock-")) return false;
+    
+    // Filter out posts with picsum photos (mock image URLs)
+    const media = Array.isArray(post.media) ? post.media : [];
+    const hasPicsumImage = media.some(item => 
+      item?.url && typeof item.url === "string" && item.url.includes("picsum.photos")
+    );
+    if (hasPicsumImage) return false;
     const content = post.content && typeof post.content === "object" ? post.content : {};
     const typeText = compactText((content as any).type);
     if (typeText === "comment") return false;
