@@ -17,14 +17,23 @@ const sanitizeRichHtml = (html: string) =>
     .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, "")
     .replace(/\shref\s*=\s*(['"])javascript:.*?\1/gi, ' href="#"');
 
+const decodeHtmlEntities = (value: string) =>
+  value
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&amp;/gi, "&");
+
 export const formatRichHtml = (raw?: string | null, fallback = "Details coming soon.") => {
   const source = typeof raw === "string" ? raw.trim() : "";
   if (!source) return `<p>${escapeHtml(fallback)}</p>`;
-  if (/<[a-z][\s\S]*>/i.test(source)) {
-    return sanitizeRichHtml(source);
+  const decodedSource = decodeHtmlEntities(source);
+  if (/<[a-z][\s\S]*>/i.test(decodedSource)) {
+    return sanitizeRichHtml(decodedSource);
   }
 
-  return source
+  return decodedSource
     .split(/\n{2,}/)
     .map((paragraph) => `<p>${escapeHtml(paragraph.replace(/\n/g, " ").trim())}</p>`)
     .join("");

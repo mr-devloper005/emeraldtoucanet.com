@@ -1,14 +1,21 @@
 import Link from 'next/link'
-import { homeGalleryWall } from '@/config/site.content'
 import { cn } from '@/lib/utils'
+import { ContentImage } from '@/components/shared/content-image'
+import { fetchTaskPosts } from '@/lib/task-data'
+import { getPostTaskKey, getPostImages } from '@/lib/task-data'
+import { buildPostUrl } from '@/lib/task-data'
+import { SITE_CONFIG } from '@/lib/site-config'
 
-export function HomeGalleryWall({
+export async function HomeGalleryWall({
   tone = 'light',
   id = 'gallery-wall',
 }: {
   tone?: 'light' | 'dark'
   id?: string
 }) {
+  // Fetch latest image posts
+  const latestPosts = await fetchTaskPosts('image', 24, { allowMockFallback: false, fresh: true })
+  
   return (
     <section
       id={id}
@@ -33,7 +40,7 @@ export function HomeGalleryWall({
               tone === 'dark' ? 'text-white' : 'text-[#280905]',
             )}
           >
-            More frames to explore
+            Latest uploads
           </h2>
           <p
             className={cn(
@@ -41,36 +48,55 @@ export function HomeGalleryWall({
               tone === 'dark' ? 'text-[#e8c4bc]/85' : 'text-[#5c2f28]/88',
             )}
           >
-            Twenty-four reference tiles—hover for captions. Each tile opens the gallery.
+            {latestPosts.length} recent frames—hover for captions. Each tile opens the post.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {homeGalleryWall.map((item, index) => (
-            <Link
-              key={`${item.src}-${index}`}
-              href="/images"
-              className={cn(
-                'group relative aspect-[3/4] overflow-hidden rounded-md border shadow-sm sm:rounded-lg',
-                tone === 'dark' ? 'border-white/10 bg-white/5' : 'border-[rgba(40,9,5,0.08)] bg-white',
-              )}
-            >
-              <img
-                src={item.src}
-                alt={`${item.caption} — ${item.location}`}
-                width={480}
-                height={640}
-                loading="lazy"
-                decoding="async"
-                referrerPolicy="no-referrer"
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-              />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#280905]/92 via-[#280905]/40 to-transparent p-2 pt-7 opacity-0 transition duration-200 group-hover:opacity-100 sm:p-2.5 sm:pt-9">
-                <p className="text-[10px] font-semibold leading-snug text-white sm:text-[11px]">{item.caption}</p>
-                <p className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.12em] text-white/78 sm:text-[9px]">{item.location}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {latestPosts.length > 0 ? (
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 sm:gap-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {latestPosts.map((post, index) => {
+              const taskKey = getPostTaskKey(post)
+              const postUrl = taskKey ? buildPostUrl(taskKey, post.slug) : `/posts/${post.slug}`
+              const postImages = getPostImages(post)
+              const imageUrl = postImages[0] || '/placeholder.svg'
+              const content = post.content && typeof post.content === 'object' ? post.content : {}
+              const location = typeof (content as any).location === 'string' ? (content as any).location : ''
+              const category = typeof (content as any).category === 'string' ? (content as any).category : ''
+              
+              return (
+                <Link
+                  key={post.id}
+                  href={postUrl}
+                  className={cn(
+                    'group relative aspect-[3/4] overflow-hidden rounded-md border shadow-sm sm:rounded-lg',
+                    tone === 'dark' ? 'border-white/10 bg-white/5' : 'border-[rgba(40,9,5,0.08)] bg-white',
+                  )}
+                >
+                  <ContentImage 
+                    src={imageUrl} 
+                    alt={post.title}
+                    fill
+                    className="object-cover transition duration-300 group-hover:scale-[1.04]"
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#280905]/92 via-[#280905]/40 to-transparent p-2 pt-7 opacity-0 transition duration-200 group-hover:opacity-100 sm:p-2.5 sm:pt-9">
+                    <p className="text-[10px] font-semibold leading-snug text-white sm:text-[11px]">{post.title}</p>
+                    <p className="mt-0.5 text-[8px] font-medium uppercase tracking-[0.12em] text-white/78 sm:text-[9px]">
+                      {location || category || 'Latest upload'}
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className={cn(
+              'text-sm',
+              tone === 'dark' ? 'text-[#e8c4bc]/85' : 'text-[#5c2f28]/88',
+            )}>
+              No uploads yet. Be the first to share your work!
+            </p>
+          </div>
+        )}
       </div>
     </section>
   )

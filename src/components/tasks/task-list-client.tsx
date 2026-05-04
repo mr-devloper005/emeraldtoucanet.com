@@ -18,39 +18,94 @@ type Props = {
 export function TaskListClient({ task, initialPosts, category }: Props) {
   const localPosts = getLocalPostsForTask(task);
 
+  // Debug: Show all posts and their categories
+  console.log('=== ALL POSTS DEBUG ===');
+  console.log('Task:', task);
+  console.log('Category filter:', category);
+  console.log('Initial posts:', initialPosts.length);
+  console.log('Local posts:', localPosts.length);
+  
+  initialPosts.forEach((post, index) => {
+    const content = post.content && typeof post.content === "object" ? post.content : {};
+    const postCategory = typeof (content as any).category === "string" ? (content as any).category : "NO_CATEGORY";
+    console.log(`Post ${index + 1}: "${post.title}" - Category: "${postCategory}"`);
+  });
+  console.log('=== END DEBUG ===');
+
   const merged = useMemo(() => {
-    const bySlug = new Set<string>();
-    const combined: Array<SitePost & { localOnly?: boolean; task?: TaskKey }> = [];
-
-    localPosts.forEach((post) => {
-      if (post.slug) {
-        bySlug.add(post.slug);
+    // Create test posts with categories if no real posts exist
+    const testPosts = initialPosts.length === 0 ? [
+      {
+        id: 'test-1',
+        slug: 'test-1',
+        title: 'Technology Post 1',
+        summary: 'A test technology post',
+        content: { category: 'technology' },
+        media: [],
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'test-2',
+        slug: 'test-2',
+        title: 'Business Post 1',
+        summary: 'A test business post',
+        content: { category: 'business' },
+        media: [],
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'test-3',
+        slug: 'test-3',
+        title: 'Technology Post 2',
+        summary: 'Another test technology post',
+        content: { category: 'technology' },
+        media: [],
+        tags: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       }
-      combined.push(post);
-    });
-
-    initialPosts.forEach((post) => {
-      if (post.slug && bySlug.has(post.slug)) return;
-      combined.push(post);
-    });
-
-    const normalizedCategory = category ? normalizeCategory(category) : "all";
-    if (normalizedCategory === "all") {
-      return combined.filter((post) => {
-        const content = post.content && typeof post.content === "object" ? post.content : {};
-        const value = typeof (content as any).category === "string" ? (content as any).category : "";
-        return !value || isValidCategory(value);
-      });
-    }
-
-    return combined.filter((post) => {
+    ] : [];
+    
+    const allPosts = [...initialPosts, ...localPosts, ...testPosts];
+    
+    console.log('=== CATEGORY FILTER TEST ===');
+    console.log('Initial posts:', initialPosts.length);
+    console.log('Local posts:', localPosts.length);
+    console.log('Test posts:', testPosts.length);
+    console.log('Total posts:', allPosts.length);
+    console.log('Category filter:', category);
+    
+    // Show all posts and their categories
+    allPosts.forEach((post, index) => {
       const content = post.content && typeof post.content === "object" ? post.content : {};
-      const value =
-        typeof (content as any).category === "string"
-          ? normalizeCategory((content as any).category)
-          : "";
-      return value === normalizedCategory;
+      const postCategory = (content as any).category || "NO_CATEGORY";
+      console.log(`Post ${index + 1}: "${post.title}" - Category: "${postCategory}"`);
     });
+    
+    // If no category filter, return all posts
+    if (!category || category === "all" || category === "") {
+      console.log('No category filter - returning all posts');
+      return allPosts;
+    }
+    
+    // Simple filter - exact match
+    const filtered = allPosts.filter((post) => {
+      const content = post.content && typeof post.content === "object" ? post.content : {};
+      const postCategory = (content as any).category || "";
+      const matches = postCategory === category;
+      
+      console.log(`Filtering "${post.title}": "${postCategory}" === "${category}" = ${matches}`);
+      return matches;
+    });
+    
+    console.log('Final result:', filtered.length, 'posts');
+    console.log('=== END TEST ===');
+    
+    return filtered;
   }, [category, initialPosts, localPosts]);
 
   if (!merged.length) {
@@ -91,8 +146,15 @@ export function TaskListClient({ task, initialPosts, category }: Props) {
     );
   }
 
+  const gridClassName =
+    task === "image"
+      ? "grid gap-6 md:grid-cols-2 xl:grid-cols-3"
+      : task === "profile"
+        ? "grid gap-6 lg:grid-cols-2"
+        : "grid gap-6 sm:grid-cols-2 lg:grid-cols-4";
+
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className={gridClassName}>
       {merged.map((post) => {
         const localOnly = (post as any).localOnly;
         const href = localOnly
