@@ -10,7 +10,7 @@ const footerLinks = {
   resources: [
     { name: 'Help Center', href: '/help' },
     { name: 'Community', href: '/community' },
-    { name: 'Status', href: '/status' },
+  
   ],
   legal: [
     { name: 'Privacy', href: '/privacy' },
