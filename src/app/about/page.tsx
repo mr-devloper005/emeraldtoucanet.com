@@ -18,9 +18,6 @@ export default function AboutPage() {
       description={about.storyLead}
       actions={
         <>
-          <Button variant="outline" className="rounded-full border-[rgba(116,10,3,0.2)] bg-white" asChild>
-            <Link href="/team">Meet the team</Link>
-          </Button>
           <Button className="rounded-full bg-[#c3110c] text-white hover:bg-[#740a03]" asChild>
             <Link href="/contact">Contact</Link>
           </Button>

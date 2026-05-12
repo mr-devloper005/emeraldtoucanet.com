@@ -40,6 +40,10 @@ const taskIcons: Record<TaskKey, any> = {
   classified: Tag,
   image: ImageIcon,
   profile: User,
+  social: LayoutGrid,
+  pdf: FileText,
+  org: Building2,
+  comment: FileText,
 }
 
 function resolveTaskKey(value: unknown, fallback: TaskKey): TaskKey {
@@ -248,14 +252,14 @@ function DirectoryHome({ primaryTask, enabledTasks, listingPosts, classifiedPost
           <div className="grid gap-4 md:grid-cols-2">
             {(profilePosts.length ? profilePosts : classifiedPosts).slice(0, 4).map((post) => {
               const meta = getPostMeta(post)
-              const taskKey = resolveTaskKey(post.task, profilePosts.length ? 'profile' : 'classified')
+              const taskKey = profilePosts.length ? 'profile' : 'classified'
               return (
                 <Link key={post.id} href={getTaskHref(taskKey, post.slug)} className={`overflow-hidden rounded-[1.8rem] ${tone.panel}`}>
                   <div className="relative h-44 overflow-hidden">
                     <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
                   </div>
                   <div className="p-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">{meta.category || post.task || 'Profile'}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">{meta.category || taskKey || 'Profile'}</p>
                     <h3 className="mt-2 text-xl font-semibold">{post.title}</h3>
                     <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>{post.summary || 'Quick access to local information and related surfaces.'}</p>
                   </div>
@@ -364,30 +368,55 @@ function VisualHome({ imagePosts, profilePosts }: { imagePosts: SitePost[]; prof
           <p className={`mx-auto mt-6 max-w-2xl text-base leading-relaxed sm:text-lg ${tone.muted}`}>{siteContent.hero.description}</p>
 
           <div className="mx-auto mt-12 grid max-w-5xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {homeHeroShowcase.map((item) => (
-              <figure
-                key={item.src}
-                className="overflow-hidden rounded-2xl border border-[rgba(40,9,5,0.08)] bg-white text-left shadow-[0_14px_40px_rgba(40,9,5,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(40,9,5,0.1)]"
-              >
-                <div className="relative aspect-[4/5] w-full bg-[#f0e6e0]">
-                  <img
-                    src={item.src}
-                    alt={item.caption}
-                    width={720}
-                    height={900}
-                    loading="eager"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <figcaption className="space-y-1 p-3.5">
-                  <p className="text-sm font-semibold leading-snug text-[#280905]">{item.caption}</p>
-                  <p className="text-xs leading-relaxed text-[#5c2f28]/88">{item.location}</p>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#740a03]/55">Library photo</p>
-                </figcaption>
-              </figure>
-            ))}
+            {gallery.length > 0 ? (
+              gallery.slice(0, 4).map((post, index) => (
+                <Link
+                  key={post.id}
+                  href={getTaskHref(imageTaskKey, post.slug)}
+                  className="group overflow-hidden rounded-2xl border border-[rgba(40,9,5,0.08)] bg-white text-left shadow-[0_14px_40px_rgba(40,9,5,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(40,9,5,0.1)]"
+                >
+                  <div className="relative aspect-[4/5] w-full bg-[#f0e6e0]">
+                    <ContentImage 
+                      src={getPostImage(post)} 
+                      alt={post.title} 
+                      fill 
+                      className="object-cover transition duration-500 group-hover:scale-[1.03]" 
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#280905]/55 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
+                  </div>
+                  <div className="space-y-1 p-3.5">
+                    <p className="text-sm font-semibold leading-snug text-[#280905]">{post.title}</p>
+                    <p className="text-xs leading-relaxed text-[#5c2f28]/88">{post.summary || 'Community upload'}</p>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#740a03]/55">Image post</p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              homeHeroShowcase.map((item) => (
+                <figure
+                  key={item.src}
+                  className="overflow-hidden rounded-2xl border border-[rgba(40,9,5,0.08)] bg-white text-left shadow-[0_14px_40px_rgba(40,9,5,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(40,9,5,0.1)]"
+                >
+                  <div className="relative aspect-[4/5] w-full bg-[#f0e6e0]">
+                    <img
+                      src={item.src}
+                      alt={item.caption}
+                      width={720}
+                      height={900}
+                      loading="eager"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <figcaption className="space-y-1 p-3.5">
+                    <p className="text-sm font-semibold leading-snug text-[#280905]">{item.caption}</p>
+                    <p className="text-xs leading-relaxed text-[#5c2f28]/88">{item.location}</p>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#740a03]/55">Library photo</p>
+                  </figcaption>
+                </figure>
+              ))
+            )}
           </div>
 
           <div className="mt-10 flex flex-wrap justify-center">
@@ -428,7 +457,7 @@ function VisualHome({ imagePosts, profilePosts }: { imagePosts: SitePost[]; prof
             {gallery.slice(0, 5).map((post, index) => (
               <Link
                 key={post.id}
-                href={getTaskHref(resolveTaskKey(post.task, imageTaskKey), post.slug)}
+                href={getTaskHref(imageTaskKey, post.slug)}
                 className={
                   index === 0
                     ? `group relative overflow-hidden rounded-[2rem] border border-[rgba(40,9,5,0.08)] bg-white shadow-[0_24px_70px_rgba(40,9,5,0.08)] sm:col-span-2 sm:row-span-2`
@@ -534,7 +563,7 @@ function CurationHome({ primaryTask, bookmarkPosts, profilePosts, articlePosts }
 
           <div className="grid gap-4 md:grid-cols-2">
             {collections.map((post) => (
-              <Link key={post.id} href={getTaskHref(resolveTaskKey(post.task, 'sbm'), post.slug)} className={`rounded-[1.8rem] p-6 ${tone.panel}`}>
+              <Link key={post.id} href={getTaskHref('sbm', post.slug)} className={`rounded-[1.8rem] p-6 ${tone.panel}`}>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">Collection</p>
                 <h3 className="mt-3 text-2xl font-semibold">{post.title}</h3>
                 <p className={`mt-3 text-sm leading-8 ${tone.muted}`}>{post.summary || 'A calmer bookmark surface with room for context and grouping.'}</p>
